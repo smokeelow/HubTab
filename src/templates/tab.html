@@ -1,0 +1,29 @@
+<html>
+<head>
+    <title>HubTab</title>
+    <script src="/core/core.js" type="text/javascript"></script>
+    <link href="/style/style.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<!--<div class="tab-nav">-->
+    <!--<button id="add-new-site" class="add button red-button">Add site</button>-->
+    <!--<div class="clear"></div>-->
+<!--</div>-->
+<div id="wrapper">
+    <div id="tabs">
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div id="modal-window">
+    <menu type=popup id=namemenu>
+        <menuitem label="Pick random name" onclick="document.forms.npc.elements.char.value = getRandomName()"/>
+        <menuitem label="Prefill other fields based on name" onclick="prefillFields(document.forms.npc.elements.char.value)"/>
+    </menu>
+    <div id="modal-close">x</div>
+    <div id="modal-content"></div>
+</div>
+<div id="modal-background"></div>
+</body>
+</html>
+
