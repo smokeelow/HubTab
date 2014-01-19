@@ -106,9 +106,11 @@ Core.addNewSite = function() {
 
 /**
  * Shows modal window
+ *
  * @param template
+ * @param callback
  */
-Core.showModal = function(template) {
+Core.showModal = function(template, callback) {
     Core.ajax('/templates/' + template + '.html', function(res) {
         ModalContent.innerHTML = res;
         ModalBackground.className = 'show-display';
@@ -125,6 +127,9 @@ Core.showModal = function(template) {
             ModalContent.querySelector('input').focus();
             Core.formBehavior(template);
         }, 100);
+
+        if(callback && typeof callback === 'function')
+            callback();
     });
 };
 
@@ -208,6 +213,9 @@ Core.formBehavior = function(type) {
         case 'add_form' :
             Core.addFormBehavior();
             break;
+        case 'edit_form' :
+            Core.editFormBehavior();
+            break;
     }
 };
 
@@ -222,7 +230,7 @@ Core.removeSelectionFromDashSites = function() {
 };
 
 /**
- * Add new site form
+ * Add site form
  */
 Core.addFormBehavior = function() {
     document.getElementById('add-form').addEventListener('submit', function(e) {
@@ -234,6 +242,39 @@ Core.addFormBehavior = function() {
             image: ''
         });
     });
+};
+
+/**
+ * Edit site form
+ */
+Core.editFormBehavior = function() {
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        Core.updateSiteInDash({
+            url: document.getElementById('site-url').value,
+            title: document.getElementById('site-title').value,
+            image: '',
+            index: document.getElementById('site-index').value
+        });
+    });
+};
+
+/**
+ * Update site in dash
+ *
+ * @param obj
+ */
+Core.updateSiteInDash = function(obj) {
+    var jsonArr = JSON.parse(localStorage['dashSites']);
+
+    console.log(jsonArr);
+    jsonArr.splice(obj.index,obj.index == 0 ? 1 : obj.index, {url: obj.url, title: obj.title, image: obj.image});
+
+    localStorage['dashSites'] = JSON.stringify(jsonArr);
+
+    Core.closeModal();
+    Core.updateSitesDash();
 };
 
 /**
@@ -254,6 +295,15 @@ Core.saveSiteToDash = function(obj) {
     Core.updateSitesDash();
 };
 
+/**
+ * Get dash site
+ *
+ * @param index
+ * @returns object
+ */
+Core.getDashSite = function(index) {
+    return JSON.parse(localStorage['dashSites'])[index];
+};
 
 /**
  * Update sites bookmarks
@@ -289,12 +339,26 @@ Core.updateSitesDash = function() {
             siteWrapper.appendChild(imageWrapper);
             siteWrapper.appendChild(title);
 
+            //context menu for dash site
             Core.contextMenu(siteWrapper, function(context, e) {
                 var dashSiteLink = e.target.className == 'dash-site-link' ? e.target : e.target.parentNode.className == 'dash-site-link' ? e.target.parentNode : e.target.parentNode.parentNode;
                 dashSiteLink.className += ' selected-item';
 
                 var edit = document.createElement('div');
                 edit.textContent = 'Edit';
+                edit.addEventListener('click', function() {
+                    Core.showModal('edit_form', function() {
+                        var siteIndex = dashSiteLink.getAttribute('data-index');
+
+                        site = Core.getDashSite(siteIndex);
+                        ModalContent.getElementsByClassName('form-title')[0].textContent = 'Edit ' + site.title;
+
+                        //fill form
+                        document.getElementById('site-url').value = site.url;
+                        document.getElementById('site-title').value = site.title;
+                        document.getElementById('site-index').value = siteIndex;
+                    });
+                });
 
                 context.appendChild(edit);
             });
@@ -404,7 +468,7 @@ Core.hotKeys = function() {
  */
 Core.init = function() {
     Core.globalContextMenu();
-    Core.hotKeys();
+//    Core.hotKeys();
     Core.getElements();
     Core.tabs();
 //    Core.loadBookmarks();
