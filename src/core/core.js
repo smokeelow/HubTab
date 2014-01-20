@@ -269,7 +269,7 @@ Core.updateSiteInDash = function(obj) {
     var jsonArr = JSON.parse(localStorage['dashSites']);
 
     console.log(jsonArr);
-    jsonArr.splice(obj.index,obj.index == 0 ? 1 : obj.index, {url: obj.url, title: obj.title, image: obj.image});
+    jsonArr.splice(obj.index, obj.index == 0 ? 1 : obj.index, {url: obj.url, title: obj.title, image: obj.image});
 
     localStorage['dashSites'] = JSON.stringify(jsonArr);
 
@@ -316,7 +316,7 @@ Core.updateSitesDash = function() {
 
         for(var x in jsonArr) {
             var site = jsonArr[x],
-                siteWrapper = document.createElement('a'),
+                siteWrapper = document.createElement('div'),
                 image = document.createElement('img'),
                 imageWrapper = document.createElement('div'),
                 title = document.createElement('div');
@@ -325,7 +325,7 @@ Core.updateSitesDash = function() {
             imageWrapper.appendChild(image);
 
             siteWrapper.className = 'dash-site-link';
-            siteWrapper.href = site.url;
+            siteWrapper.setAttribute('data-url', site.url);
             siteWrapper.setAttribute('data-index', x);
 
             title.className = 'title';
@@ -338,6 +338,10 @@ Core.updateSitesDash = function() {
 
             siteWrapper.appendChild(imageWrapper);
             siteWrapper.appendChild(title);
+
+            siteWrapper.addEventListener('click', function() {
+                window.location = this.getAttribute('data-url');
+            });
 
             //context menu for dash site
             Core.contextMenu(siteWrapper, function(context, e) {
@@ -464,16 +468,31 @@ Core.hotKeys = function() {
 };
 
 /**
+ * All drag events
+ */
+Core.dragEvents = function() {
+//    function handleDragStart(e) {
+//        this.style.opacity = '0.4';  // this / e.target is the source node.
+//    }
+//
+//    var cols = document.querySelectorAll('#tabs .dash-site-link');
+//    [].forEach.call(cols, function(col) {
+//        col.addEventListener('dragstart', handleDragStart, false);
+//    });
+};
+
+/**
  * Init all functionality
  */
 Core.init = function() {
     Core.globalContextMenu();
 //    Core.hotKeys();
+//    Core.loadBookmarks();
     Core.getElements();
     Core.tabs();
-//    Core.loadBookmarks();
     Core.buttonsActions();
     Core.updateSitesDash();
+    Core.dragEvents();
 };
 
 //run app
