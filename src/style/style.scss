@@ -193,6 +193,10 @@ a:hover {
   opacity: 1 !important;
 }
 
+.hide-opacity {
+  opacity: 0 !important;
+}
+
 header {
   @extend .black-nav-gradient;
   border: 1px solid;
@@ -282,7 +286,7 @@ header {
   @include animation-two(200ms);
   margin: 0 auto;
   padding: 30px 0 0;
-  width: 1150px;
+  width: 90%;
   @extend .relative;
   z-index: 400;
 }
@@ -367,79 +371,84 @@ header {
 
 #tabs {
   @include animation-one(150ms);
-  $dashTitleColorHover: #5492FF;
+  @extend .relative;
+  height: 100%;
+  z-index: 2;
+}
 
-  .dash-site-link {
+$dashTitleColorHover: #5492FF;
+.dash-site-link {
+  -webkit-transform: translate3d(0%, 0%, 0);
+  transform: translate3d(0%, 0%, 0);
+  @include animation-one(350ms);
+  border-radius: 4px;
+  display: inline-block;
+  @extend .absolute;
+  height: 265px;
+  width: 25%;
+  text-align: center;
+
+  .image-wrapper {
+    @include animation-one(100ms);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
     background: #fff;
     border-radius: 4px;
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
-    display: inline-block;
-    margin: 0 30px 50px 0;
-    height: 160px;
-    width: 265px;
-    text-align: center;
+    margin: 0 auto;
+    height: 80%;
+    width:95%;
 
-    .image-wrapper {
-      @include animation-one(100ms);
-      border-radius: 4px;
-      height: 100%;
-
-      .toolbar-dash-site {
-        display: none;
-      }
-    }
-
-    img {
-      height: 100%;
-      width: 100%;
-    }
-
-    .no-image {
-      position: relative;
-      top: 50px;
-      opacity: 0.2;
-      height: 50px;
-      width: 50px;
-    }
-
-    .title {
-      @include animation-two(200ms);
-      background: #fff;
-      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
-      border-radius: 20px;
-      color: #303030;
-      display: inline-block;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: 15px;
-      padding: 2px 10px;
-      margin: 10px auto 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    &:hover {
-      .title {
-        color: $dashTitleColorHover;
-      }
-    }
-
-    &:nth-child(4n) {
-      margin: 0 0 50px 0;
-    }
-
-    &.selected-item {
-      .image-wrapper {
-        box-shadow: 0 0 0px 3px #80C2FF, 0 2px 5px rgba(0, 0, 0, 0.86);
-      }
-
-      .title {
-        color: $dashTitleColorHover;
-      }
+    .toolbar-dash-site {
+      display: none;
     }
   }
 
+  img {
+    height: 100%;
+    width: 100%;
+  }
+
+  .no-image {
+    @extend .relative;
+    top: 38%;
+    opacity: 0.2;
+    height: 50px;
+    width: 50px;
+  }
+
+  .title {
+    @include animation-two(200ms);
+    background: #fff;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
+    border-radius: 20px;
+    color: #303030;
+    display: inline-block;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    padding: 2px 10px;
+    margin: 10px auto 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    cursor: pointer;
+    .title {
+      color: $dashTitleColorHover;
+    }
+  }
+
+  &.selected-item {
+    .image-wrapper {
+      box-shadow: 0 0 0px 3px #80C2FF, 0 2px 5px rgba(0, 0, 0, 0.86);
+    }
+
+    .title {
+      color: $dashTitleColorHover;
+    }
+  }
 }
+
 
 #context-menu {
   @include animation-one(250ms);
