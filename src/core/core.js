@@ -269,7 +269,7 @@ Core.editFormBehavior = function() {
 Core.updateSiteInDash = function(obj) {
     var jsonArr = JSON.parse(localStorage['dashSites']);
 
-    jsonArr.splice(obj.index, obj.index == 0 ? 1 : obj.index, {url: obj.url, title: obj.title, image: obj.image});
+    jsonArr.splice(obj.index, 1, {url: obj.url, title: obj.title, image: obj.image});
 
     localStorage['dashSites'] = JSON.stringify(jsonArr);
 
@@ -306,6 +306,20 @@ Core.saveSiteToDash = function(obj) {
     localStorage['dashSites'] = JSON.stringify(jsonArr);
 
     Core.closeModal();
+    Core.updateSitesDash();
+};
+
+/**
+ * Delete dash site
+ *
+ * @param index
+ */
+Core.removeDashSiteByIndex = function(index) {
+    var jsonArr = JSON.parse(localStorage['dashSites']);
+
+    jsonArr.splice(index, 1);
+
+    localStorage['dashSites'] = JSON.stringify(jsonArr);
     Core.updateSitesDash();
 };
 
@@ -352,11 +366,8 @@ Core.getDashSite = function(index) {
 Core.clearTabs = function() {
     var i = Tabs.childElementCount;
 
-    while (--i >= 0) {
-        console.log(Tabs.firstChild);
+    while (--i >= 0)
         Tabs.removeChild(Tabs.firstChild);
-    }
-
 };
 
 /**
@@ -410,12 +421,16 @@ Core.updateSitesDash = function() {
                 var dashSiteLink = e.target.classList.contains('dash-site-link') ? e.target : e.target.parentNode.classList.contains('dash-site-link') ? e.target.parentNode : e.target.parentNode.parentNode;
                 dashSiteLink.className += ' selected-item';
 
+                var siteIndex = dashSiteLink.getAttribute('data-index');
+
+                /**
+                 * Edit button
+                 * @type {HTMLElement}
+                 */
                 var edit = document.createElement('div');
                 edit.textContent = 'Edit';
                 edit.addEventListener('click', function() {
                     Core.showModal('edit_form', function() {
-                        var siteIndex = dashSiteLink.getAttribute('data-index');
-
                         site = Core.getDashSite(siteIndex);
                         ModalContent.getElementsByClassName('form-title')[0].textContent = 'Edit ' + site.title;
 
@@ -426,7 +441,14 @@ Core.updateSitesDash = function() {
                     });
                 });
 
+                var del  = document.createElement('div');
+                del.textContent = 'Delete';
+                del.addEventListener('click', function() {
+                    Core.removeDashSiteByIndex(siteIndex);
+                });
+
                 context.appendChild(edit);
+                context.appendChild(del);
             });
 
             Tabs.appendChild(siteWrapper);
