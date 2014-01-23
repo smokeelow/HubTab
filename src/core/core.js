@@ -89,7 +89,7 @@ Core.loadBookmarks = function() {
  * Most used web sites
  */
 Core.tabs = function() {
-    if(localStorage['most-used-tabs']) {
+    if(localStorage['dashSites']) {
 
     } else {
         Tabs.innerHTML += '<div class="empty-text">Please add some web site :(</div>';
@@ -350,8 +350,13 @@ Core.getDashSite = function(index) {
  * Remove all elements from tabs container
  */
 Core.clearTabs = function() {
-    while (Tabs.firstChild)
+    var i = Tabs.childElementCount;
+
+    while (--i >= 0) {
+        console.log(Tabs.firstChild);
         Tabs.removeChild(Tabs.firstChild);
+    }
+
 };
 
 /**
