@@ -269,13 +269,26 @@ Core.editFormBehavior = function() {
 Core.updateSiteInDash = function(obj) {
     var jsonArr = JSON.parse(localStorage['dashSites']);
 
-    console.log(jsonArr);
     jsonArr.splice(obj.index, obj.index == 0 ? 1 : obj.index, {url: obj.url, title: obj.title, image: obj.image});
 
     localStorage['dashSites'] = JSON.stringify(jsonArr);
 
     Core.closeModal();
     Core.updateSitesDash();
+};
+
+/**
+ * Save changed positions of dash sites
+ */
+Core.saveChangedPositions = function() {
+    var jsonArr = [],
+        sites = Tabs.getElementsByClassName('dash-site-link');
+
+    for(var i = 0, size = sites.length; i < size; i++) {
+        jsonArr[i] = JSON.parse(sites[i].getAttribute('data-object'));
+    }
+
+    localStorage['dashSites'] = JSON.stringify(jsonArr);
 };
 
 /**
@@ -296,6 +309,33 @@ Core.saveSiteToDash = function(obj) {
     Core.updateSitesDash();
 };
 
+
+/**
+ * Reindex dash sites
+ */
+Core.reIndexSitesDash = function(cells) {
+    var sites = Tabs.getElementsByClassName('dash-site-link'),
+        cell = 0;
+
+    for(var i = 0, size = sites.length; i < size; i++) {
+        var site = sites[i];
+        site.classList.remove('first-cell-elem');
+        site.classList.remove('last-cell-elem');
+
+        if(i != 0 && cell < cells)
+            cell++;
+        else if(cell == cells)
+            cell = 0;
+
+        if(cell == 0)
+            site.classList.toggle('first-cell-elem');
+        else if(cell == cells)
+            site.classList.toggle('last-cell-elem');
+
+        sites[i].setAttribute('data-index', i);
+    }
+};
+
 /**
  * Get dash site
  *
@@ -307,11 +347,20 @@ Core.getDashSite = function(index) {
 };
 
 /**
+ * Remove all elements from tabs container
+ */
+Core.clearTabs = function() {
+    while (Tabs.firstChild)
+        Tabs.removeChild(Tabs.firstChild);
+};
+
+/**
  * Update sites bookmarks
  */
 Core.updateSitesDash = function() {
     if(Core.isDashSitesEmpty()) {
-        Tabs.innerHTML = '';
+
+        Core.clearTabs();
 
         var jsonArr = JSON.parse(localStorage['dashSites']);
 
@@ -326,9 +375,11 @@ Core.updateSitesDash = function() {
             imageWrapper.appendChild(image);
 
             siteWrapper.className = 'dash-site-link';
+            siteWrapper.setAttribute('data-object', JSON.stringify(site));
             siteWrapper.setAttribute('data-url', site.url);
             siteWrapper.setAttribute('data-index', x);
             siteWrapper.setAttribute('draggable', 'true');
+
 
             title.className = 'title';
             title.textContent = site.title;
@@ -342,13 +393,16 @@ Core.updateSitesDash = function() {
             siteWrapper.appendChild(imageWrapper);
             siteWrapper.appendChild(title);
 
-            siteWrapper.addEventListener('click', function() {
-                window.location = this.getAttribute('data-url');
+            siteWrapper.addEventListener('click', function(e) {
+                if(e.which == 2) {
+                    window.open(this.getAttribute('data-url'),'_blank');
+                } else
+                    window.location = this.getAttribute('data-url');
             });
 
             //context menu for dash site
             Core.contextMenu(siteWrapper, function(context, e) {
-                var dashSiteLink = e.target.className == 'dash-site-link' ? e.target : e.target.parentNode.className == 'dash-site-link' ? e.target.parentNode : e.target.parentNode.parentNode;
+                var dashSiteLink = e.target.classList.contains('dash-site-link') ? e.target : e.target.parentNode.classList.contains('dash-site-link') ? e.target.parentNode : e.target.parentNode.parentNode;
                 dashSiteLink.className += ' selected-item';
 
                 var edit = document.createElement('div');
@@ -373,6 +427,8 @@ Core.updateSitesDash = function() {
             Tabs.appendChild(siteWrapper);
         }
     }
+
+    Core.dragEvents();
 };
 
 /**
@@ -474,13 +530,12 @@ Core.hotKeys = function() {
  * All drag events
  */
 Core.dragEvents = function() {
-    //get all elements that will be dragged
+    //cache
     var dashSites = Tabs.getElementsByClassName('dash-site-link'),
         dashSitesSize = dashSites.length,
         headStyles = document.createElement('style'),
-        cells = 3;
-
-    var DragElement;
+        cells = 3,
+        DragElement;
 
     /**
      * Handle 'dragstart' event
@@ -489,11 +544,8 @@ Core.dragEvents = function() {
      */
     function dragStart(e) {
         DragElement = this;
-        var copyNode = this.cloneNode(true);
         this.className += ' hide-opacity';
-        HideElements.appendChild(copyNode);
 
-        e.dataTransfer.setDragImage(copyNode,0,0);
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/html', this.innerHTML);
     }
@@ -505,13 +557,15 @@ Core.dragEvents = function() {
      * @returns {boolean}
      */
     function dragOver(e) {
-        if(e.preventDefault) {
-            e.preventDefault(); // Necessary. Allows us to drop.
-        }
+        e.preventDefault();
 
-        e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+        e.dataTransfer.dropEffect = 'move';
 
         return false;
+    }
+
+    function insertAfter(referenceNode, newNode) {
+        referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
     }
 
     /**
@@ -520,9 +574,19 @@ Core.dragEvents = function() {
      * @param e
      */
     function dragEnter(e) {
-        this.className += ' over';
+        if(DragElement != this) {
+            this.className += ' over';
 
-        Tabs.insertBefore(DragElement, this);
+            if(this.classList.contains('last-cell-elem'))
+                Tabs.insertBefore(DragElement, this.nextSibling);
+            else if(this.classList.contains('first-cell-elem'))
+                Tabs.insertBefore(DragElement, this);
+            else
+                insertAfter(this, DragElement);
+
+            Core.saveChangedPositions();
+            Core.reIndexSitesDash(cells);
+        }
     }
 
     /**
@@ -560,7 +624,7 @@ Core.dragEvents = function() {
         this.classList.remove('hide-opacity');
 
         for(var i = 0; i < dashSitesSize; i++)
-            dashSites[i].className = 'dash-site-link';
+            dashSites[i].classList.remove('over');
     }
 
     for(var i = 0, left = 0, top = 0, raw = 0, cell = 0; i < dashSitesSize; i++) {
@@ -590,6 +654,11 @@ Core.dragEvents = function() {
             top = raw + '00%';
         }
 
+        if(cell == 0)
+            site.className += ' first-cell-elem';
+        else if(cell == cells)
+            site.className += ' last-cell-elem';
+
         headStyles.textContent += '.dash-site-link:nth-child(' + (i + 1) + '){-webkit-transform: translate3d(' + left + ', ' + top + ', 0)}' + "\n";
     }
 
@@ -607,7 +676,6 @@ Core.init = function() {
     Core.tabs();
     Core.buttonsActions();
     Core.updateSitesDash();
-    Core.dragEvents();
 };
 
 //run app
