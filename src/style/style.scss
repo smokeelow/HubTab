@@ -447,6 +447,10 @@ $dashTitleColorHover: #5492FF;
       color: $dashTitleColorHover;
     }
   }
+
+  &.over {
+//    box-shadow: 0 0 10px #000;
+  }
 }
 
 
