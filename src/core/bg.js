@@ -1,3 +1,30 @@
 /**
- * Created by smokeelow on 1/22/14.
+ * Track all sites
+ *
+ * @param tabID
+ * @param tabState
+ * @param tab
  */
+chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
+    //wait for full load
+    if(tab.url !== undefined && tabState.status == 'complete') {
+
+        var domain = tab.url.split('/')[2].replace('www.','');
+
+        if(localStorage['dashSites'].indexOf(domain) > -1) {
+            chrome.tabs.captureVisibleTab(null, function (dataURI) {
+                var jsonArr  = JSON.parse(localStorage['dashSites']);
+
+                for(var x in jsonArr) {
+                    var site = jsonArr[x];
+
+                    if(site.url.indexOf(domain) >- 1) {
+                        site.image = dataURI;
+                    }
+                }
+
+                localStorage['dashSites'] = JSON.stringify(jsonArr);
+            });
+        }
+    }
+});

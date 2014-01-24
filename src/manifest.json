@@ -4,15 +4,12 @@
     "version": "0.1",
     "incognito": "split",
     "background": {
+        "persistent": false,
         "scripts": ["core/bg.js"]
     },
     "permissions": [
-        "bookmarks",
         "tabs",
-        "chrome://favicon/*",
-        "http://*/*",
-        "https://*/*",
-        "script-src"
+        "*://*/*"
     ],
     "chrome_url_overrides": {
         "newtab": "templates/tab.html"
