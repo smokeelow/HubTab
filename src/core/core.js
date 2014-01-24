@@ -378,8 +378,8 @@ Core.updateSitesDash = function() {
 
         var jsonArr = JSON.parse(localStorage['dashSites']);
 
-        for(var x in jsonArr) {
-            var site = jsonArr[x],
+        for(var i = 0, size = jsonArr.length; i < size; i++) {
+            var site = jsonArr[i],
                 siteWrapper = document.createElement('div'),
                 image = document.createElement('img'),
                 imageWrapper = document.createElement('div'),
@@ -391,7 +391,7 @@ Core.updateSitesDash = function() {
             siteWrapper.className = 'dash-site-link';
             siteWrapper.setAttribute('data-object', JSON.stringify(site));
             siteWrapper.setAttribute('data-url', site.url);
-            siteWrapper.setAttribute('data-index', x);
+            siteWrapper.setAttribute('data-index', i);
             siteWrapper.setAttribute('draggable', 'true');
 
 

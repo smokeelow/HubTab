@@ -6,25 +6,32 @@
  * @param tab
  */
 chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
+    var jsonArr = JSON.parse(localStorage['dashSites']),
+        domain = '',
+        site = {};
+
     //wait for full load
     if(tab.url !== undefined && tabState.status == 'complete') {
 
-        var domain = tab.url.split('/')[2].replace('www.','');
+        domain = tab.url.split('/')[2].replace('www.', '');
 
         if(localStorage['dashSites'].indexOf(domain) > -1) {
-            chrome.tabs.captureVisibleTab(null, function (dataURI) {
-                var jsonArr  = JSON.parse(localStorage['dashSites']);
 
-                for(var x in jsonArr) {
-                    var site = jsonArr[x];
+            for(var i = 0, size = jsonArr.length; i < size; i++) {
+                site = jsonArr[i];
 
-                    if(site.url.indexOf(domain) >- 1) {
-                        site.image = dataURI;
+                if(site.url.indexOf(domain) > -1) {
+                    if(site.image == '' || site.image == undefined) {
+                        chrome.tabs.captureVisibleTab(null, function(dataURI) {
+                            site.image = dataURI;
+                            break;
+                        });
                     }
-                }
 
-                localStorage['dashSites'] = JSON.stringify(jsonArr);
-            });
+                }
+            }
+            localStorage['dashSites'] = JSON.stringify(jsonArr);
+
         }
     }
 });
