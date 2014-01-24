@@ -5,10 +5,12 @@
  * @param tabState
  * @param tab
  */
+var jsonArr = JSON.parse(localStorage['dashSites']),
+    domain = '',
+    site = {};
+
 chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
-    var jsonArr = JSON.parse(localStorage['dashSites']),
-        domain = '',
-        site = {};
+
 
     //wait for full load
     if(tab.url !== undefined && tabState.status == 'complete') {
