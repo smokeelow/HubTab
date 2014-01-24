@@ -1,5 +1,5 @@
 /**
- * Track all sites
+ * Track all tabs updates
  *
  * @param tabID
  * @param tabState
@@ -24,14 +24,13 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
                     if(site.image == '' || site.image == undefined) {
                         chrome.tabs.captureVisibleTab(null, function(dataURI) {
                             site.image = dataURI;
-                            break;
                         });
                     }
 
-                }
+                } break;
             }
-            localStorage['dashSites'] = JSON.stringify(jsonArr);
 
+            localStorage['dashSites'] = JSON.stringify(jsonArr);
         }
     }
 });

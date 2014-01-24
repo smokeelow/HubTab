@@ -364,7 +364,7 @@ Core.getDashSite = function(index) {
 Core.clearTabs = function() {
     var i = Tabs.childElementCount;
 
-    while (--i >= 0)
+    while(--i >= 0)
         Tabs.removeChild(Tabs.firstChild);
 };
 
@@ -411,7 +411,7 @@ Core.updateSitesDash = function() {
 
             siteWrapper.addEventListener('click', function(e) {
                 if(e.which == 2) {
-                    window.open(this.getAttribute('data-url'),'_blank');
+                    window.open(this.getAttribute('data-url'), '_blank');
                 } else
                     window.location = this.getAttribute('data-url');
             });
@@ -441,7 +441,7 @@ Core.updateSitesDash = function() {
                     });
                 });
 
-                var del  = document.createElement('div');
+                var del = document.createElement('div');
                 del.textContent = 'Delete';
                 del.addEventListener('click', function() {
                     Core.removeDashSiteByIndex(siteIndex);
@@ -626,23 +626,6 @@ Core.dragEvents = function() {
     }
 
     /**
-     * Handle 'dragdrop' event
-     *
-     * @param e
-     * @returns {boolean}
-     */
-    function dragDrop(e) {
-        if(e.stopPropagation)
-            e.stopPropagation();
-
-        if(DragElement != this) {
-
-        }
-
-        return false;
-    }
-
-    /**
      * Handle 'dragend' event
      *
      * @param e
@@ -661,7 +644,6 @@ Core.dragEvents = function() {
         site.addEventListener('dragenter', dragEnter)
         site.addEventListener('dragover', dragOver);
         site.addEventListener('dragleave', dragLeave);
-        site.addEventListener('drop', dragDrop);
         site.addEventListener('dragend', dragEnd);
 
         if(i != 0 && cell < cells)
