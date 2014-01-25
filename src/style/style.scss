@@ -469,29 +469,32 @@ $dashTitleColorHover: #5492FF;
 }
 
 #context-menu {
-  @include animation-one(250ms);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, .5);
-  border-radius: 4px;
+  @include animation-one(150ms);
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.19), 0 7px 16px rgba(0, 0, 0, 0.28);
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
   min-width: 200px;
   padding: 5px 0;
   font-size: 14px;
   @extend .absolute;
+  opacity: 1;
   z-index: 999999;
   cursor: default;
 
   div {
     @include animation-one(150ms);
     padding: 3px 5px 3px 15px;
-    line-height: 16px;
-    height: 20px;
+    line-height: 20px;
+    color:#333;
+    height: 25px;
     width: 100%;
 
     img {
       @include animation-one(150ms);
       float: left;
       opacity: 1;
-      margin: 0 5px 0 0;
+      margin: 3px 5px 0 0;
       height: 14px;
       width: 14px;
     }
@@ -501,16 +504,7 @@ $dashTitleColorHover: #5492FF;
     }
 
     &:hover {
-      background: #416EFF;
-      color: #fff;
-
-      img {
-        display: none;
-      }
-
-      .hover-image {
-        display: block;
-      }
+      background: #eeeeee;
     }
 
     .hotkeys {
