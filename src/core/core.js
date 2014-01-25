@@ -479,11 +479,12 @@ Core.contextMenu = function(element, callback) {
     element.addEventListener('contextmenu', function(e) {
         e.stopPropagation();
         e.preventDefault();
-        context.style.opacity = 1;
+
         Core.removeExistingMenu();
         Core.removeSelectionFromDashSites();
-
         Core.clearElement(context);
+        
+        context.style.opacity = 1;
         context.setAttribute('id', 'context-menu');
         context.style.top = e.pageY + 'px';
         context.style.left = e.pageX + 'px';
