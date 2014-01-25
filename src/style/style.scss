@@ -140,7 +140,7 @@ a {
 }
 
 body {
-  background: #f0f0f0;
+  background: #DADADA;
   color: #333;
   font: 12px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
   -webkit-user-select: none;
@@ -268,9 +268,8 @@ header {
 }
 
 .empty-text {
-  color: #ccc;
+  color: #8b8b8b;
   text-align: center;
-  text-shadow: 0 1px 0 #fff;
   margin: 40px 0 0;
   font-size: 18px;
 }
@@ -381,34 +380,43 @@ $dashTitleColorHover: #5492FF;
   -webkit-transform: translate3d(0%, 0%, 0);
   transform: translate3d(0%, 0%, 0);
   @include animation-one(350ms);
-  border-radius: 4px;
   display: inline-block;
   @extend .absolute;
-  height: 265px;
+  height: 250px;
   width: 25%;
   text-align: center;
 
   .image-wrapper {
     @include animation-one(100ms);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
     background: #fff;
-    border-radius: 4px;
+    @extend .relative;
     margin: 0 auto;
-    height: 80%;
-    width:95%;
+    overflow: hidden;
+    text-align: center;
+    height: 100%;
+    width: 100%;
 
     .toolbar-dash-site {
       display: none;
     }
-  }
 
-  img {
-    height: 100%;
-    width: 100%;
+    img {
+      @include animation-one(250ms);
+      @extend .absolute;
+    }
+
+    &.has-background-image {
+      background-size: cover;
+      background-position: center;
+
+      img {
+        display: none;
+      }
+    }
   }
 
   .no-image {
-    @extend .relative;
+    position: relative !important;
     top: 38%;
     opacity: 0.2;
     height: 50px;
@@ -416,26 +424,28 @@ $dashTitleColorHover: #5492FF;
   }
 
   .title {
+//    -webkit-transform: translate3d(0, 0, 0) scale(1);
+//    transform: translate3d(0, 0, 0) scale(1);
     @include animation-two(200ms);
-    background: #fff;
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
-    border-radius: 20px;
-    color: #303030;
+    background: rgba(255,255,255, 0.98);
+    box-shadow: 0 2px 4px 1px black;
+    color: #333;
     display: inline-block;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 15px;
-    padding: 2px 10px;
-    margin: 10px auto 0;
+    padding: 5px 0;
+    margin: 0 auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 0px;
   }
 
   &:hover {
     cursor: pointer;
-    .title {
-      color: $dashTitleColorHover;
-    }
   }
 
   &.selected-item {
@@ -448,11 +458,15 @@ $dashTitleColorHover: #5492FF;
     }
   }
 
-  &.over {
-//    box-shadow: 0 0 10px #000;
+  .content-wrapper {
+    margin: 0 auto;
+    height: 90%;
+    width: 95%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.42);
   }
 }
-
 
 #context-menu {
   @include animation-one(250ms);
