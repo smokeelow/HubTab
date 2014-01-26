@@ -6,6 +6,26 @@
  * @param tab
  */
 
+window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+
+/**
+ * File System
+ * @type object
+ */
+var fs = null;
+
+function errorHandler(e) {
+    console.log('Error: ' + e.name);
+}
+
+function fsInit() {
+    window.requestFileSystem(window.TEMPORARY, 10 * 1024 * 1024, function(filesystem) {
+        fs = filesystem;
+    }, errorHandler);
+}
+
+if(window.requestFileSystem)
+    fsInit();
 
 chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
 
@@ -17,16 +37,44 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
         if(localStorage['dashSites'].indexOf(domain) > -1) {
             chrome.tabs.captureVisibleTab(null, function(dataURI) {
 
-                var jsonArr = JSON.parse(localStorage['dashSites']);
+                var data = atob(dataURI.substring('data:image/jpeg;base64,'.length)),
+                    uArr = new Uint8Array(data.length),
+                    imgName = domain.replace('.', '_') + '.jpeg';
 
-                for(var i = 0, size = jsonArr.length; i < size; i++) {
-                    var site = jsonArr[i];
+                for(var i = 0, len = data.length; i < len; ++i)
+                    uArr[i] = data.charCodeAt(i);
 
-                    if(site.url.indexOf(domain) > -1)
-                        site.image = dataURI;
-                }
+                var blob = new Blob([ uArr.buffer ], {type: 'image/jpeg'});
 
-                localStorage['dashSites'] = JSON.stringify(jsonArr);
+                fs.root.getFile(imgName, {create:true}, function(fileEntry) {
+
+                    fileEntry.createWriter(function(fileWriter) {
+
+                        fileWriter.onwriteend = function(e) {
+
+                            var jsonArr = JSON.parse(localStorage['dashSites']);
+
+                            for(var i = 0, size = jsonArr.length; i < size; i++) {
+                                var site = jsonArr[i];
+
+                                if(site.url.indexOf(domain) > -1)
+                                    site.image = fileEntry.toURL();
+                            }
+
+                            localStorage['dashSites'] = JSON.stringify(jsonArr);
+                        };
+
+                        fileWriter.onerror = function(e) {
+                            console.log('Write failed: ' + e.toString());
+                        };
+
+                        fileWriter.write(blob);
+
+                    }, errorHandler);
+                });
+
+
+
             });
         }
     }
