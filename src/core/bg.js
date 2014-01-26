@@ -21,32 +21,33 @@ function errorHandler(e) {
 function fsInit() {
     window.requestFileSystem(window.TEMPORARY, 10 * 1024 * 1024, function(filesystem) {
         fs = filesystem;
+
+        fs.root.getFile('vk_com.jpeg', {}, function(filentry){
+            filentry.getMetadata(function(meta){
+
+            })
+        });
     }, errorHandler);
 }
 
-if(window.requestFileSystem)
-    fsInit();
+fsInit();
 
 chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
 
     //wait for full load
     if(tab.url !== undefined && tabState.status == 'complete') {
 
-        var domain = tab.url.split('/')[2].replace('www.', '');
-
-        if(localStorage['dashSites'].indexOf(domain) > -1) {
+        if(localStorage['dashSites'].indexOf(tab.url.split('/')[2].replace('www.', '')) > -1) {
             chrome.tabs.captureVisibleTab(null, function(dataURI) {
 
                 var data = atob(dataURI.substring('data:image/jpeg;base64,'.length)),
                     uArr = new Uint8Array(data.length),
-                    imgName = domain.replace('.', '_') + '.jpeg';
+                    imgName = tab.url.split('/')[2].replace('www.', '').replace('.', '_') + '.jpeg';
 
-                for(var i = 0, len = data.length; i < len; ++i)
+                for(var i = 0, size = data.length; i < size; ++i)
                     uArr[i] = data.charCodeAt(i);
 
-                var blob = new Blob([ uArr.buffer ], {type: 'image/jpeg'});
-
-                fs.root.getFile(imgName, {create:true}, function(fileEntry) {
+                fs.root.getFile(imgName, {create: true}, function(fileEntry) {
 
                     fileEntry.createWriter(function(fileWriter) {
 
@@ -55,10 +56,8 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
                             var jsonArr = JSON.parse(localStorage['dashSites']);
 
                             for(var i = 0, size = jsonArr.length; i < size; i++) {
-                                var site = jsonArr[i];
-
-                                if(site.url.indexOf(domain) > -1)
-                                    site.image = fileEntry.toURL();
+                                if(jsonArr[i].url.indexOf(tab.url.split('/')[2].replace('www.', '')) > -1)
+                                    jsonArr[i].image = fileEntry.toURL();
                             }
 
                             localStorage['dashSites'] = JSON.stringify(jsonArr);
@@ -68,13 +67,10 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
                             console.log('Write failed: ' + e.toString());
                         };
 
-                        fileWriter.write(blob);
+                        fileWriter.write(new Blob([ uArr.buffer ], {type: 'image/jpeg'}));
 
                     }, errorHandler);
                 });
-
-
-
             });
         }
     }
