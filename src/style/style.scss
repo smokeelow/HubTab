@@ -407,7 +407,7 @@ $dashTitleColorHover: #5492FF;
 
     &.has-background-image {
       background-size: cover;
-      background-position: center;
+      background-position: top center;
 
       img {
         display: none;
@@ -424,8 +424,6 @@ $dashTitleColorHover: #5492FF;
   }
 
   .title {
-//    -webkit-transform: translate3d(0, 0, 0) scale(1);
-//    transform: translate3d(0, 0, 0) scale(1);
     @include animation-two(200ms);
     background: rgba(255,255,255, 0.98);
     box-shadow: 0 2px 4px 1px black;
