@@ -612,7 +612,7 @@ Core.dragEvents = function() {
      * @param e
      */
     function dragLeave(e) {
-        this.classList.remove('over');  // this / e.target is previous target element.
+        this.classList.remove('over');
     }
 
     /**
