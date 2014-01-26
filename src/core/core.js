@@ -1,5 +1,37 @@
 //Most usable elements
-var Bookmarks, AddNewSite, Tabs, ModalWindow, ModalWindowClose, ModalContent, ModalBackground, Wrapper, HideElements;
+var Bookmarks, AddNewSite, Tabs, ModalWindow, ModalWindowClose, ModalContent, ModalBackground, Wrapper, HideElements, context, fs;
+
+//Check For File System Object
+window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+
+/**
+ * File System
+ * @type object
+ */
+var fs = null;
+
+
+/**
+ * File System Errors
+ *
+ * @param e
+ */
+function errorHandler(e) {
+    console.log('Error: ' + e.name);
+}
+
+/**
+ * Initiate file system
+ */
+function fsInit() {
+    window.requestFileSystem(window.TEMPORARY, 10 * 1024 * 1024, function(filesystem) {
+        fs = filesystem;
+    }, errorHandler);
+}
+
+if(window.requestFileSystem)
+    fsInit();
+
 
 /**
  * Main object
@@ -53,6 +85,7 @@ Core.getElements = function() {
     ModalBackground = document.getElementById('modal-background');
     Wrapper = document.getElementById('wrapper');
     HideElements = document.getElementById('hide-elements');
+    context = document.createElement('div');
 };
 
 /**
@@ -323,6 +356,19 @@ Core.removeDashSiteByIndex = function(index) {
     Core.updateSitesDash();
 };
 
+/**
+ * Delete dash site image
+ *
+ * @param name
+ */
+Core.removeDashSiteImage = function(name) {
+    fs.root.getFile(name, {create: false}, function(fileEntry) {
+        fileEntry.remove(function() {
+            console.log('File removed');
+        }, errorHandler);
+    }, errorHandler);
+};
+
 
 /**
  * Reindex dash sites
@@ -453,6 +499,7 @@ Core.updateSitesDash = function() {
                 del.textContent = 'Delete';
                 del.addEventListener('click', function() {
                     Core.removeDashSiteByIndex(siteIndex);
+                    Core.removeDashSiteImage(site.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '').replace('.', '_') + '.jpeg');
                 });
 
                 context.appendChild(edit);
@@ -473,8 +520,6 @@ Core.updateSitesDash = function() {
  * @param callback
  */
 Core.contextMenu = function(element, callback) {
-
-    var context = document.createElement('div');
 
     element.addEventListener('contextmenu', function(e) {
         e.stopPropagation();

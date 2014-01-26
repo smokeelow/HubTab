@@ -64,62 +64,69 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
             var imgName = domain.replace('.', '_') + '.jpeg';
 
             //check if file exists
-            fs.root.getFile(imgName, {create: true}, function(filentry) {
+            fs.root.getFile(imgName, {create: false}, function(filentry) {
 
                 filentry.getMetadata(function(meta) {
 
                     //check if file older than one day
                     if(Date.daysPassed(new Date(meta.modificationTime).getTime(), new Date().getTime()) >= 1) {
-
-                        //capture screenshot of current page
-                        chrome.tabs.captureVisibleTab(null, function(dataURI) {
-
-                            //get current active tab
-                            chrome.tabs.getSelected(function(tab) {
-
-                                //compare with opened/updated tab
-                                if(cacheTabId == tab.id) {
-                                    //convert to bytes
-                                    var data = atob(dataURI.substring('data:image/jpeg;base64,'.length)),
-                                        uArr = new Uint8Array(data.length);
-
-                                    for(var i = 0, size = data.length; i < size; ++i)
-                                        uArr[i] = data.charCodeAt(i);
-
-                                    //save file to File System and LocalStorage
-                                    fs.root.getFile(imgName, {create: true}, function(fileEntry) {
-
-                                        fileEntry.createWriter(function(fileWriter) {
-
-                                            fileWriter.onwriteend = function(e) {
-
-                                                var jsonArr = JSON.parse(localStorage['dashSites']);
-
-                                                for(var i = 0, size = jsonArr.length; i < size; i++) {
-
-                                                    if(tab.url == jsonArr[i].url)
-                                                        jsonArr[i].image = fileEntry.toURL();
-                                                    else if(jsonArr[i].url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '') == domain)
-                                                        jsonArr[i].image = fileEntry.toURL();
-                                                }
-
-                                                localStorage['dashSites'] = JSON.stringify(jsonArr);
-                                            };
-
-                                            fileWriter.onerror = function(e) {
-                                                console.log('Write failed: ' + e.toString());
-                                            };
-
-                                            fileWriter.write(new Blob([ uArr.buffer ], {type: 'image/jpeg'}));
-
-                                        }, errorHandler);
-                                    });
-                                }
-                            });
-                        });
+                        takeScreenshot();
                     }
                 });
+            }, function(e) {
+                takeScreenshot();
             });
         }
+    }
+
+    function takeScreenshot() {
+        //capture screenshot of current page
+        chrome.tabs.captureVisibleTab(null, function(dataURI) {
+
+            //get current active tab
+            chrome.tabs.getSelected(function(tab) {
+
+                //compare with opened/updated tab
+                if(cacheTabId == tab.id) {
+                    //convert to bytes
+                    var data = atob(dataURI.substring('data:image/jpeg;base64,'.length)),
+                        uArr = new Uint8Array(data.length);
+
+                    for(var i = 0, size = data.length; i < size; ++i)
+                        uArr[i] = data.charCodeAt(i);
+
+                    //save file to File System and LocalStorage
+                    fs.root.getFile(imgName, {create: true}, function(fileEntry) {
+
+                        fileEntry.createWriter(function(fileWriter) {
+
+                            fileWriter.onwriteend = function(e) {
+
+                                var jsonArr = JSON.parse(localStorage['dashSites']);
+
+                                for(var i = 0, size = jsonArr.length; i < size; i++) {
+
+                                    if(tab.url == jsonArr[i].url)
+                                        jsonArr[i].image = fileEntry.toURL();
+                                    else if(jsonArr[i].url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '') == domain)
+                                        jsonArr[i].image = fileEntry.toURL();
+                                }
+
+                                localStorage['dashSites'] = JSON.stringify(jsonArr);
+
+                                console.log(fileEntry.toURL());
+                            };
+
+                            fileWriter.onerror = function(e) {
+                                console.log('Write failed: ' + e.toString());
+                            };
+
+                            fileWriter.write(new Blob([ uArr.buffer ], {type: 'image/jpeg'}));
+
+                        }, errorHandler);
+                    }, errorHandler);
+                }
+            });
+        });
     }
 });
