@@ -67,13 +67,14 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
             fs.root.getFile(imgName, {create: false}, function(filentry) {
 
                 filentry.getMetadata(function(meta) {
-
+                    console.log(meta);
                     //check if file older than one day
                     if(Date.daysPassed(new Date(meta.modificationTime).getTime(), new Date().getTime()) >= 1) {
                         takeScreenshot();
                     }
                 });
             }, function(e) {
+                errorHandler(e);
                 takeScreenshot();
             });
         }
@@ -113,6 +114,7 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
                                 }
 
                                 localStorage['dashSites'] = JSON.stringify(jsonArr);
+
                             };
 
                             fileWriter.onerror = function(e) {

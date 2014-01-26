@@ -269,10 +269,21 @@ Core.addFormBehavior = function() {
     document.getElementById('add-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        Core.saveSiteToDash({
-            url: document.getElementById('site-url').value,
-            title: document.getElementById('site-title').value,
-            image: ''
+        fs.root.getFile(document.getElementById('site-url').value.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '').replace('.', '_') + '.jpeg', {create: false}, function(fileEntry) {
+            Core.saveSiteToDash({
+                url: document.getElementById('site-url').value,
+                title: document.getElementById('site-title').value,
+                image: fileEntry.toURL()
+            });
+
+        }, function(e) {
+            errorHandler(e);
+
+            Core.saveSiteToDash({
+                url: document.getElementById('site-url').value,
+                title: document.getElementById('site-title').value,
+                image: ''
+            });
         });
     });
 };
@@ -284,11 +295,24 @@ Core.editFormBehavior = function() {
     document.getElementById('edit-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        Core.updateSiteInDash({
-            url: document.getElementById('site-url').value,
-            title: document.getElementById('site-title').value,
-            image: document.getElementById('site-image').value,
-            index: document.getElementById('site-index').value
+        var imageUrl = '';
+
+        fs.root.getFile(document.getElementById('site-url').value.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '').replace('.', '_') + '.jpeg', {create: false}, function(fileEntry) {
+            Core.updateSiteInDash({
+                url: document.getElementById('site-url').value,
+                title: document.getElementById('site-title').value,
+                image: fileEntry.toURL(),
+                index: document.getElementById('site-index').value
+            });
+        }, function(e) {
+            errorHandler(e);
+
+            Core.updateSiteInDash({
+                url: document.getElementById('site-url').value,
+                title: document.getElementById('site-title').value,
+                image: document.getElementById('site-image').value,
+                index: document.getElementById('site-index').value
+            });
         });
     });
 };
