@@ -295,8 +295,6 @@ Core.editFormBehavior = function() {
     document.getElementById('edit-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        var imageUrl = '';
-
         fs.root.getFile(document.getElementById('site-url').value.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '').replace('.', '_') + '.jpeg', {create: false}, function(fileEntry) {
             Core.updateSiteInDash({
                 url: document.getElementById('site-url').value,
