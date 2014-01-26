@@ -113,8 +113,6 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
                                 }
 
                                 localStorage['dashSites'] = JSON.stringify(jsonArr);
-
-                                console.log(fileEntry.toURL());
                             };
 
                             fileWriter.onerror = function(e) {
