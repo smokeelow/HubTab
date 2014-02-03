@@ -7,10 +7,6 @@
         "persistent": false,
         "scripts": ["core/bg.js"]
     },
-    "permissions": [
-        "tabs",
-        "*://*/*"
-    ],
     "chrome_url_overrides": {
         "newtab": "templates/tab.html"
     },

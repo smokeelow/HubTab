@@ -613,7 +613,7 @@ Core.dragEvents = function() {
 
         DragElement = this;
         Clone = this.cloneNode(true);
-        
+
         HideElements.appendChild(Clone);
 
         e.dataTransfer.setDragImage(Clone, Clone.clientWidth / 2, Clone.clientHeight / 2);
