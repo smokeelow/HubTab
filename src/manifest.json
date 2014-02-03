@@ -1,12 +1,16 @@
 {
     "name": "HubTab",
     "description": "All that you need in one place",
-    "version": "0.2",
+    "version": "0.3",
     "incognito": "split",
     "background": {
         "persistent": false,
         "scripts": ["core/bg.js"]
     },
+    "permissions": [
+        "tabs",
+        "*://*/*"
+    ],
     "chrome_url_overrides": {
         "newtab": "templates/tab.html"
     },
