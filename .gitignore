@@ -5,3 +5,6 @@ src/style/style.css
 *.pem
 
 *.crx
+
+server/*
+*.zip

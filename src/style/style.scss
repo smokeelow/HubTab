@@ -118,13 +118,12 @@ html, body {
 input, textarea {
   @include animation-two(150ms);
   border: 1px solid #ccc;
-  border-radius: 2px;
   padding: 10px;
   width: 100%;
 }
 
 input:hover, input:focus {
-  border-color: #B2E5FF;
+  border-color: #5FC9FF;
 }
 
 input:focus {
@@ -216,8 +215,7 @@ header {
 
 .button {
   @include animation-two(200ms);
-  background: #303030;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
+  background: #535353;
   border: none;
   display: block;
   padding: 10px 20px;
@@ -230,8 +228,6 @@ header {
   font-family: RaleyNormal, sans-serif;
   font-size: 15px;
   cursor: pointer;
-  background: #d1dade;
-  border-radius: 3px;
   background-image: none !important;
   min-width: 120px;
 
@@ -298,14 +294,18 @@ header {
   @include animation-one(300ms);
 }
 
+.close-modal-win {
+  -webkit-transform: perspective(1000px) rotate3d(10, 0, 0, 10deg) scale(0.8) !important;
+}
+
 #modal-window {
-  @include animation-one(400ms);
+  @include animation-one(250ms);
   background: #fff;
-  box-shadow: 0 0px 10px -2px rgba(0, 0, 0, 0.40);
-  border-radius: 3px;
-  -webkit-transform: perspective(1000px) rotate3d(9, 0, 0, -80deg) scale(0);
+  display: none;
+  box-shadow: 0 0px 10px -2px rgba(0, 0, 0, 0.80);
+  -webkit-transform: perspective(1000px) rotate3d(9, 0, 0, -20deg) scale(0.8);
   transform: scale(0);
-  @extend .absolute;
+  @extend .fixed;
   top: 50px;
   left: 50%;
   margin-left: -300px;
@@ -340,10 +340,9 @@ header {
   width: 45px;
   height: 20px;
   background: rgba(255, 0, 0, 0.42);
-  text-align: right;
+  text-align: center;
   line-height: 21px;
-  border-radius: 0 3px 0 20px;
-  padding: 0 15px 0 0;
+  padding:0;
   font-weight: bold;
   font-family: Helvetica, Arial, sans-serif;
 
@@ -358,8 +357,8 @@ header {
 
 .form {
   .form-title {
-    font-family: HelveticaNeueCyrUltraLight;
-    font-size: 25px;
+    font-size: 22px;
+    font-weight:normal;
     margin: 0 0 15px;
   }
 
@@ -447,6 +446,11 @@ $dashTitleColorHover: #5492FF;
   }
 
   &.selected-item {
+    .content-wrapper {
+      -webkit-transform: scale(1.01);
+      box-shadow: 0 0 0px 2px #6FAFFF, 0 7px 28px 0px #818181;
+    }
+
     .image-wrapper {
       box-shadow: 0 0 0px 3px #80C2FF, 0 2px 5px rgba(0, 0, 0, 0.86);
     }
@@ -457,6 +461,7 @@ $dashTitleColorHover: #5492FF;
   }
 
   .content-wrapper {
+    @include animation-one(150ms);
     margin: 0 auto;
     height: 90%;
     width: 95%;
@@ -469,9 +474,7 @@ $dashTitleColorHover: #5492FF;
 #context-menu {
   @include animation-one(150ms);
   background: #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.19), 0 7px 16px rgba(0, 0, 0, 0.28);
-  border: 1px solid;
-  border-color: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
+  box-shadow: 0 23px 28px rgba(0, 0, 0, 0.11), 0 7px 16px rgba(0, 0, 0, 0.27), 0 0 6px rgba(0, 0, 0, 0.31);
   min-width: 200px;
   padding: 5px 0;
   font-size: 14px;

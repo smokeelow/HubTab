@@ -1,3 +1,9 @@
+/*===================== GLOBAL BLOCK > =====================*/
+
+var regexp = /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i,
+    baseRegExp = /http:\/\/|http:\/\/www.|https:\/\/www.|https:\/\//g,
+    json = {};
+
 /**
  * Calculate how many days passed
  *
@@ -12,35 +18,10 @@ Date.daysPassed = function(firstDate, secondDate) {
     return Math.round(diff / day);
 };
 
-//Check For File System Object
-window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+/*===================== GLOBAL BLOCK > =====================*/
 
-/**
- * File System
- * @type object
- */
-var fs = null;
 
-/**
- * File System Errors
- *
- * @param e
- */
-function errorHandler(e) {
-    console.log('Error: ' + e.name);
-}
-
-/**
- * Set File System Var
- */
-function fsInit() {
-    window.requestFileSystem(window.TEMPORARY, 10 * 1024 * 1024, function(filesystem) {
-        fs = filesystem;
-    }, errorHandler);
-}
-
-//Load File system
-fsInit();
+/*===================== CHROME BLOCK > =====================*/
 
 /**
  * Track all tabs updates
@@ -53,7 +34,7 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
     if(tab.url !== undefined && tabState.status == 'complete') {
 
         var cacheTabId = tab.id,
-            domain = tab.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+            domain = tab.url.match(regexp);
 
         //if url is ok
         if(domain)
@@ -61,72 +42,48 @@ chrome.tabs.onUpdated.addListener(function(tabID, tabState, tab) {
 
         if(localStorage['dashSites'].indexOf(domain) > -1) {
 
-            var imgName = domain.replace('.', '_') + '.jpeg';
+            //make screenshot of visible area
+            chrome.tabs.captureVisibleTab(null, {quality: 10}, function(dataURI) {
 
-            //check if file exists
-            fs.root.getFile(imgName, {create: false}, function(filentry) {
+                //get current active tab
+                chrome.tabs.getSelected(function(tab) {
 
-                filentry.getMetadata(function(meta) {
-                    console.log(meta);
-                    //check if file older than one day
-                    if(Date.daysPassed(new Date(meta.modificationTime).getTime(), new Date().getTime()) >= 1) {
-                        takeScreenshot();
+                    //compare with opened/updated tab
+                    if(cacheTabId == tab.id) {
+
+                        var jsonArr = JSON.parse(localStorage['dashSites']),
+                            url = tab.url.replace(baseRegExp, '');
+
+                        for(var i = 0, size = jsonArr.length; i < size; i++) {
+                            var siteUrl = jsonArr[i].url.replace(baseRegExp, '')
+
+                            if(jsonArr[i].imageDate !== undefined && jsonArr[i] != '') {
+                                if(Date.daysPassed(new Date(jsonArr[i].imageDate).getTime(), new Date().getTime()) >= 1) {
+                                    if(url.indexOf(siteUrl) > -1) {
+                                        jsonArr[i].image = dataURI;
+                                        jsonArr[i].imageDate = new Date().getTime();
+                                    } else if(siteUrl == url) {
+                                        jsonArr[i].image = dataURI;
+                                        jsonArr[i].imageDate = new Date().getTime();
+                                    }
+                                }
+                            } else {
+                                if(url.indexOf(siteUrl) > -1) {
+                                    jsonArr[i].image = dataURI;
+                                    jsonArr[i].imageDate = new Date().getTime();
+                                } else if(siteUrl == url) {
+                                    jsonArr[i].image = dataURI;
+                                    jsonArr[i].imageDate = new Date().getTime();
+                                }
+                            }
+                        }
+
+                        localStorage['dashSites'] = JSON.stringify(jsonArr);
                     }
                 });
-            }, function(e) {
-                errorHandler(e);
-                takeScreenshot();
             });
         }
     }
-
-    function takeScreenshot() {
-        //capture screenshot of current page
-        chrome.tabs.captureVisibleTab(null, function(dataURI) {
-
-            //get current active tab
-            chrome.tabs.getSelected(function(tab) {
-
-                //compare with opened/updated tab
-                if(cacheTabId == tab.id) {
-                    //convert to bytes
-                    var data = atob(dataURI.substring('data:image/jpeg;base64,'.length)),
-                        uArr = new Uint8Array(data.length);
-
-                    for(var i = 0, size = data.length; i < size; ++i)
-                        uArr[i] = data.charCodeAt(i);
-
-                    //save file to File System and LocalStorage
-                    fs.root.getFile(imgName, {create: true}, function(fileEntry) {
-
-                        fileEntry.createWriter(function(fileWriter) {
-
-                            fileWriter.onwriteend = function(e) {
-
-                                var jsonArr = JSON.parse(localStorage['dashSites']);
-
-                                for(var i = 0, size = jsonArr.length; i < size; i++) {
-
-                                    if(tab.url == jsonArr[i].url)
-                                        jsonArr[i].image = fileEntry.toURL();
-                                    else if(jsonArr[i].url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '') == domain)
-                                        jsonArr[i].image = fileEntry.toURL();
-                                }
-
-                                localStorage['dashSites'] = JSON.stringify(jsonArr);
-
-                            };
-
-                            fileWriter.onerror = function(e) {
-                                console.log('Write failed: ' + e.toString());
-                            };
-
-                            fileWriter.write(new Blob([ uArr.buffer ], {type: 'image/jpeg'}));
-
-                        }, errorHandler);
-                    }, errorHandler);
-                }
-            });
-        });
-    }
 });
+
+/*===================== CHROME BLOCK < =====================*/
