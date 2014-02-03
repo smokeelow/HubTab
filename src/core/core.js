@@ -609,11 +609,12 @@ Core.dragEvents = function() {
      * @param e
      */
     function dragStart(e) {
+        this.className += ' hide-opacity';
+
         DragElement = this;
         Clone = this.cloneNode(true);
+        
         HideElements.appendChild(Clone);
-
-        this.className += ' hide-opacity';
 
         e.dataTransfer.setDragImage(Clone, Clone.clientWidth / 2, Clone.clientHeight / 2);
         e.dataTransfer.effectAllowed = 'move';
