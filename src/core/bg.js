@@ -1,8 +1,7 @@
 /*===================== GLOBAL BLOCK > =====================*/
 
 var regexp = /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i,
-    baseRegExp = /http:\/\/|http:\/\/www.|https:\/\/www.|https:\/\//g,
-    json = {};
+    baseRegExp = /http:\/\/|http:\/\/www.|https:\/\/www.|https:\/\//g;
 
 /**
  * Calculate how many days passed

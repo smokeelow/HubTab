@@ -518,9 +518,6 @@ Core.contextMenu = function(element, callback) {
         context.setAttribute('id', 'context-menu');
         context.style.opacity = 1;
 
-//        context.style.top = e.pageY + 'px';
-//        context.style.left = e.pageX + 'px';
-
         if(callback && typeof callback === 'function')
             callback(context, e);
 
@@ -601,7 +598,10 @@ Core.dragEvents = function() {
         dashSitesSize = dashSites.length,
         headStyles = document.createElement('style'),
         cells = 3,
-        DragElement;
+        DragElement,
+        Clone,
+        HideOverlay = document.getElementById('hide-overlay'),
+        HideElements = document.getElementById('hide-elements');
 
     /**
      * Handle 'dragstart' event
@@ -610,9 +610,12 @@ Core.dragEvents = function() {
      */
     function dragStart(e) {
         DragElement = this;
+        Clone = this.cloneNode(true);
+        HideElements.appendChild(Clone);
+
         this.className += ' hide-opacity';
 
-//        e.dataTransfer.setDragImage(this, 0, 0);
+        e.dataTransfer.setDragImage(Clone, Clone.clientWidth / 2, Clone.clientHeight / 2);
         e.dataTransfer.effectAllowed = 'move';
     }
 
@@ -683,6 +686,7 @@ Core.dragEvents = function() {
      * @param e
      */
     function dragEnd(e) {
+        HideElements.removeChild(Clone);
         this.classList.remove('hide-opacity');
 
         for(var i = 0; i < dashSitesSize; i++)
