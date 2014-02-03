@@ -1,7 +1,7 @@
 {
     "name": "HubTab",
     "description": "All that you need in one place",
-    "version": "0.1",
+    "version": "0.2",
     "incognito": "split",
     "background": {
         "persistent": false,
