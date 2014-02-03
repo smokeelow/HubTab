@@ -11,8 +11,6 @@ var
     HideElements,
     context,
     siteRegExp = /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i,
-    windowWidth = 0,
-    windowHeight = 0,
     contextY = '',
     contextX = '';
 
