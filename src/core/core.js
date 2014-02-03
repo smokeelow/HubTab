@@ -484,7 +484,6 @@ Core.updateSitesDash = function() {
                 del.textContent = 'Delete';
                 del.addEventListener('click', function() {
                     Core.removeDashSiteByIndex(siteIndex);
-                    Core.removeDashSiteImage(site.url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i)[1].replace('www.', '').replace('.', '_') + '.jpeg');
                 });
 
                 context.appendChild(edit);
