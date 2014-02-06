@@ -1,6 +1,7 @@
 {
-    "name": "Light Tab",
-    "description": "All that you need in one place",
+    "name": "__MSG_appName__",
+    "description": "__MSG_appDesc__",
+    "default_locale": "en",
     "version": "0.0.4",
     "incognito": "split",
     "background": {

@@ -1,0 +1,11 @@
+{
+    "appName": {
+        "message": "Light Tab",
+        "decription": "Name of App"
+    },
+
+    "appDesc": {
+        "message": "Replacement for new tab. Simple speed dial.",
+        "description": "app description"
+    }
+}
