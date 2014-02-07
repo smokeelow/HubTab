@@ -442,10 +442,8 @@ Core.updateSitesDash = function() {
             siteWrapper.addEventListener('click', function(e) {
                 if(e.which == 2)
                     window.open(this.getAttribute('data-url'), '_blank');
-                else {
-//                    window.history.pushState({foo:'bar'},'Lalka',this.getAttribute('data-url'))
-
-                }
+                else
+                    window.location = this.getAttribute('data-url');
             });
 
             //context menu for dash site
