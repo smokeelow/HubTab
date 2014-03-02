@@ -7,5 +7,21 @@
     "appDesc": {
         "message": "Replacement for new tab. Simple speed dial.",
         "description": "app description"
+    },
+
+    "edit": {
+        "message": "Edit"
+    },
+
+    "delete": {
+        "message": "Delete"
+    },
+
+    "openInNewTab": {
+        "message": "Open in new tab"
+    },
+
+    "addSite": {
+        "message": "Add site"
     }
 }

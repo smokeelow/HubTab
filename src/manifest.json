@@ -1,11 +1,11 @@
 {
     "name": "__MSG_appName__",
     "description": "__MSG_appDesc__",
-    "default_locale": "en",
-    "version": "0.5",
+    "default_locale": "ru",
+    "version": "0.6",
     "incognito": "split",
     "background": {
-        "persistent": false,
+        "persistent": true,
         "scripts": ["core/bg.js"]
     },
     "permissions": [

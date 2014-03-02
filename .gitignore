@@ -1,6 +1,7 @@
 .idea/*
 examples/*
 src/style/style.css
+release/*
 
 *.pem
 

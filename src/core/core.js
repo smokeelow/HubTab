@@ -397,6 +397,8 @@ Core.clearElement = function(element) {
  * Update sites bookmarks
  */
 Core.updateSitesDash = function() {
+    var divE = document.createElement('div');
+
     if(Core.isDashSitesEmpty()) {
 
         Core.clearElement(Tabs);
@@ -405,16 +407,23 @@ Core.updateSitesDash = function() {
 
         for(var i = 0, size = jsonArr.length; i < size; i++) {
             var site = jsonArr[i],
-                siteWrapper = document.createElement('div'),
+                siteWrapper = divE.cloneNode(false),
                 image = document.createElement('img'),
-                imageWrapper = document.createElement('div'),
-                title = document.createElement('div'),
-                imgTitleWrapper = document.createElement('div');
+                imageWrapper = divE.cloneNode(false),
+                title = divE.cloneNode(false),
+                imgTitleWrapper = divE.cloneNode(false);
 
             imageWrapper.className = 'image-wrapper';
             imageWrapper.appendChild(image);
 
+            var tstr = site.url.replace('://', '')
+                .split('/')
+                .join('')
+                .replace(/#/g, '')
+                .replace(/\./g, '');
+
             siteWrapper.className = 'dash-site-link';
+            siteWrapper.setAttribute('id', tstr);
             siteWrapper.setAttribute('data-object', JSON.stringify(site));
             siteWrapper.setAttribute('data-url', site.url);
             siteWrapper.setAttribute('data-index', i);
@@ -428,7 +437,6 @@ Core.updateSitesDash = function() {
                 image.className = 'no-image';
                 image.setAttribute('draggable', 'false');
             } else {
-                imageWrapper.style.backgroundImage= 'url(' + site.image + ')';
                 imageWrapper.className += ' has-background-image';
             }
 
@@ -461,18 +469,30 @@ Core.updateSitesDash = function() {
 
                 dashSiteLink.className += ' selected-item';
 
-                var siteIndex = dashSiteLink.getAttribute('data-index');
+                var siteIndex = dashSiteLink.getAttribute('data-index'),
+                    tempUrl = dashSiteLink.getAttribute('data-url');
+
+                /**
+                 * Open in new tab button
+                 * @type {Node}
+                 */
+                var openInNewTab = divE.cloneNode(false);
+                openInNewTab.textContent = chrome.i18n.getMessage('openInNewTab');
+                openInNewTab.addEventListener('click', function() {
+                    chrome.tabs.create({url: tempUrl, active: false}, function(tab) {
+                    });
+                });
 
                 /**
                  * Edit button
-                 * @type {HTMLElement}
+                 * @type {Node}
                  */
-                var edit = document.createElement('div');
-                edit.textContent = 'Edit';
+                var edit = divE.cloneNode(false);
+                edit.textContent = chrome.i18n.getMessage('edit');
                 edit.addEventListener('click', function() {
                     Core.showModal('edit_form', function() {
                         site = Core.getDashSite(siteIndex);
-                        ModalContent.getElementsByClassName('form-title')[0].textContent = 'Edit ' + site.title;
+                        ModalContent.getElementsByClassName('form-title')[0].textContent = chrome.i18n.getMessage('edit') + ' ' + site.title;
 
                         //fill form
                         document.getElementById('site-url').value = site.url;
@@ -482,12 +502,17 @@ Core.updateSitesDash = function() {
                     });
                 });
 
-                var del = document.createElement('div');
-                del.textContent = 'Delete';
+                /**
+                 * Delete button
+                 * @type {Node}
+                 */
+                var del = divE.cloneNode(false);
+                del.textContent = chrome.i18n.getMessage('delete');
                 del.addEventListener('click', function() {
                     Core.removeDashSiteByIndex(siteIndex);
                 });
 
+                context.appendChild(openInNewTab);
                 context.appendChild(edit);
                 context.appendChild(del);
             });
@@ -553,7 +578,7 @@ Core.contextMenu = function(element, callback) {
  * Global context menu items
  */
 Core.globalContextMenu = function() {
-    Core.contextMenu(document.firstElementChild, function(context) {
+    Core.contextMenu(Wrapper, function(context) {
 
         /**
          * Add site
@@ -561,7 +586,7 @@ Core.globalContextMenu = function() {
          */
         var addSite = document.createElement('div');
         addSite.className = 'add-icon';
-        addSite.textContent = 'Add site';
+        addSite.textContent = chrome.i18n.getMessage('addSite');
         addSite.addEventListener('click', function() {
             Core.showModal('add_form');
         });
@@ -596,18 +621,19 @@ Core.hotKeys = function() {
 Core.dragEvents = function() {
     //cache
     var dashSites = Tabs.getElementsByClassName('dash-site-link'),
+        jsonArr = JSON.parse(localStorage['dashSites']),
         dashSitesSize = dashSites.length,
         headStyles = document.createElement('style'),
         cells = 3,
         DragElement,
         Clone,
-        HideOverlay = document.getElementById('hide-overlay'),
+//        HideOverlay = document.getElementById('hide-overlay'),
         HideElements = document.getElementById('hide-elements');
 
     /**
      * Handle 'dragstart' event
      *
-     * @param e
+     * @param {Event} e
      */
     function dragStart(e) {
         DragElement = this;
@@ -622,7 +648,7 @@ Core.dragEvents = function() {
     /**
      * Handle 'dragover' event
      *
-     * @param e
+     * @param {Event} e
      * @returns {boolean}
      */
     function dragOver(e) {
@@ -636,7 +662,7 @@ Core.dragEvents = function() {
     /**
      * Handle 'dragenter' event
      *
-     * @param e
+     * @param {Event} e
      */
     function dragEnter(e) {
         if(DragElement != this) {
@@ -657,7 +683,7 @@ Core.dragEvents = function() {
     /**
      * Handle 'dragleave' envent
      *
-     * @param e
+     * @param {Event} e
      */
     function dragLeave(e) {
         this.classList.remove('over');
@@ -666,7 +692,7 @@ Core.dragEvents = function() {
     /**
      * Handle 'dragdrop' event
      *
-     * @param e
+     * @param {Event} e
      * @returns {boolean}
      */
     function dragDrop(e) {
@@ -683,7 +709,7 @@ Core.dragEvents = function() {
     /**
      * Handle 'dragend' event
      *
-     * @param e
+     * @param {Event} e
      */
     function dragEnd(e) {
         HideElements.removeChild(Clone);
@@ -695,10 +721,11 @@ Core.dragEvents = function() {
 
     //set drag events
     for(var i = 0, left = 0, top = 0, raw = 0, cell = 0; i < dashSitesSize; i++) {
-        var site = dashSites[i];
+        var site = dashSites[i],
+            siteData = jsonArr[i];
 
         site.addEventListener('dragstart', dragStart);
-        site.addEventListener('dragenter', dragEnter)
+        site.addEventListener('dragenter', dragEnter);
         site.addEventListener('dragover', dragOver);
         site.addEventListener('dragleave', dragLeave);
         site.addEventListener('dragdrop', dragDrop);
@@ -726,7 +753,15 @@ Core.dragEvents = function() {
         else if(cell == cells)
             site.className += ' last-cell-elem';
 
-        headStyles.textContent += '.dash-site-link:nth-child(' + (i + 1) + '){-webkit-transform: translate3d(' + left + ', ' + top + ', 0)}';
+        var indexStyle = i + 1;
+
+        var sID = '#' + siteData.url.replace('://', '')
+            .split('/')
+            .join('')
+            .replace(/#/g, '')
+            .replace(/\./g, '');
+
+        headStyles.textContent += '.dash-site-link:nth-child(' + indexStyle + '){-webkit-transform: translate3d(' + left + ', ' + top + ', 0);} ' + sID + ' .image-wrapper {background-image:url(' + siteData.image + ');}';
     }
 
     document.head.appendChild(headStyles);
@@ -736,10 +771,11 @@ Core.dragEvents = function() {
  * Init all functionality
  */
 Core.init = function() {
-    Core.globalContextMenu();
+
 //    Core.hotKeys();
 //    Core.loadBookmarks();
     Core.getElements();
+    Core.globalContextMenu();
     Core.tabs();
     Core.buttonsActions();
     Core.updateSitesDash();
